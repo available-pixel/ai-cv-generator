@@ -8,18 +8,16 @@ def render_template1(user_data, hex_color="#000000"):
     pdf.add_page()
 
     # ================= FONTS =================
-    # Get folder where this file is
-    BASE_DIR = os.path.dirname(__file__)
-    FONT_DIR = os.path.join(BASE_DIR, "../dejavu-sans")  # adjust "../" if your modules folder is nested differently
+    BASE_DIR = os.path.dirname(__file__)  # folder of this file
+    FONT_DIR = os.path.join(BASE_DIR, "..", "dejavu-sans")  # relative to project root
 
     pdf.add_font('DejaVu', '', os.path.join(FONT_DIR, 'DejaVuSans.ttf'), uni=True)
     pdf.add_font('DejaVu', 'B', os.path.join(FONT_DIR, 'DejaVuSans-Bold.ttf'), uni=True)
     pdf.add_font('DejaVu', 'I', os.path.join(FONT_DIR, 'DejaVuSans-Oblique.ttf'), uni=True)
     pdf.add_font('DejaVu', 'BI', os.path.join(FONT_DIR, 'DejaVuSans-BoldOblique.ttf'), uni=True)
 
-    # Color
+    # ================= COLOR & MARGINS =================
     r, g, b = tuple(int(hex_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4))
-
     LEFT_MARGIN = 15
     RIGHT_MARGIN = 195
     WIDTH = RIGHT_MARGIN - LEFT_MARGIN
@@ -55,10 +53,8 @@ def render_template1(user_data, hex_color="#000000"):
     # ================= PROFILE PHOTO =================
     profile_photo = user_data.get("profile_photo")
     if profile_photo:
-        # Move pointer to start
         profile_photo.seek(0)
-        # Place image top-right corner
-        pdf.image(profile_photo, x=180, y=5, w=20, h=0)  # adjust position & size as needed
+        pdf.image(profile_photo, x=180, y=5, w=20, h=0)
 
     pdf.set_font("DejaVu", "", 11)
     pdf.set_text_color(0, 0, 0)
@@ -129,24 +125,19 @@ def render_template1(user_data, hex_color="#000000"):
                 pdf.multi_cell(WIDTH - 12, 5, proj.get("technologies"))
 
             links = [l for l in proj.get("links", []) if l.strip()]
-
             if links:
                 pdf.set_x(12)
                 pdf.set_font("DejaVu", "B", 10)
                 pdf.cell(12, 5, "Links:")
                 start_x = pdf.get_x()
                 pdf.set_font("DejaVu", "I", 10)
-
                 for i, link in enumerate(links):
                     text = link + (" | " if i < len(links) - 1 else "")
                     text_width = pdf.get_string_width(text)
-
                     if pdf.get_x() + text_width > RIGHT_MARGIN:
                         pdf.ln(5)
                         pdf.set_x(start_x)
-
                     pdf.cell(text_width, 5, text, link=link)
-
             pdf.ln(6)
 
     # ================= SKILLS =================
@@ -163,17 +154,14 @@ def render_template1(user_data, hex_color="#000000"):
 
         if valid_certifications:
             section_title(pdf, "CERTIFICATIONS", r, g, b)
-
             for cert in valid_certifications:
                 pdf.set_font("DejaVu", "B", 11)
                 pdf.set_x(10)
                 pdf.cell(0, 6, cert.get("name", ""), ln=True)
-
                 if cert.get("link"):
                     pdf.set_font("DejaVu", "I", 10)
                     pdf.set_x(12)
                     pdf.cell(0, 5, cert.get("link"), ln=True, link=cert.get("link"))
-
                 pdf.ln(2)
 
     # ================= LANGUAGES =================
@@ -196,22 +184,15 @@ def render_template1(user_data, hex_color="#000000"):
 
     if valid_education:
         section_title(pdf, "EDUCATION", r, g, b)
-
         for edu in valid_education:
             pdf.set_font("DejaVu", "B", 11)
             pdf.set_x(10)
             pdf.cell(0, 6, edu.get("degree", ""), ln=True)
-
-            info = " | ".join(filter(None, [
-                edu.get("school"),
-                edu.get("year")
-            ]))
-
+            info = " | ".join(filter(None, [edu.get("school"), edu.get("year")]))
             if info:
                 pdf.set_font("DejaVu", "I", 10)
                 pdf.set_x(12)
                 pdf.multi_cell(WIDTH, 5, info)
-
             pdf.ln(2)
 
     # ================= EXPERIENCE =================
@@ -224,22 +205,18 @@ def render_template1(user_data, hex_color="#000000"):
             pdf.set_font("DejaVu", "B", 11)
             pdf.set_x(10)
             pdf.cell(0, 6, exp.get("job", ""), ln=True)
-
             info = " | ".join(filter(None, [exp.get("company"), exp.get("duration")]))
             if info:
                 pdf.set_font("DejaVu", "I", 10)
                 pdf.set_x(12)
                 pdf.multi_cell(WIDTH, 5, info)
-
             if exp.get("description"):
                 pdf.set_font("DejaVu", "", 11)
                 pdf.set_x(12)
                 pdf.multi_cell(WIDTH, 5, clean_text(exp.get("description")))
-
             pdf.ln(2)
 
     return pdf
-
 
 # ================= HELPER =================
 def section_title(pdf, title, r, g, b):
