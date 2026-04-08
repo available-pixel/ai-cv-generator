@@ -315,7 +315,7 @@ elif menu == "📄 Preview & Download":
         with st.spinner("Generating CV..."):
             pdf_bytes = generate_cv_pdf(user_data, return_bytes=True)
 
-        # Download button
+        # ✅ Download button
         st.download_button(
             "⬇️ Download CV",
             pdf_bytes,
@@ -323,12 +323,18 @@ elif menu == "📄 Preview & Download":
             "application/pdf"
         )
 
-        # Inline preview
+        # ✅ Browser preview using EMBED (works in Chrome)
         import base64
-        base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
-        st.markdown(
-            f"<iframe src='data:application/pdf;base64,{base64_pdf}' width='100%' height='700'></iframe>",
-            unsafe_allow_html=True
-        )
+        base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+
+        pdf_display = f"""
+        <embed 
+            src="data:application/pdf;base64,{base64_pdf}" 
+            width="100%" 
+            height="700px" 
+            type="application/pdf">
+        """
+
+        st.markdown(pdf_display, unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
