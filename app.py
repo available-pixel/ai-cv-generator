@@ -312,10 +312,12 @@ elif menu == "📄 Preview & Download":
     if not user_data:
         st.warning("Fill the CV first")
     else:
+        import tempfile
+
         with st.spinner("Generating CV..."):
             pdf_bytes = generate_cv_pdf(user_data, return_bytes=True)
 
-        # ✅ Download button
+        # ✅ Download
         st.download_button(
             "⬇️ Download CV",
             pdf_bytes,
@@ -323,8 +325,12 @@ elif menu == "📄 Preview & Download":
             "application/pdf"
         )
 
-        # ✅ Preview
+        # ✅ Save + Preview
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+            tmp.write(pdf_bytes)
+            tmp_path = tmp.name
+
         st.write("### 📄 Preview")
-        st.pdf(pdf_bytes)
+        st.pdf(tmp_path)
 
     st.markdown("</div>", unsafe_allow_html=True)
