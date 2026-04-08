@@ -312,12 +312,10 @@ elif menu == "📄 Preview & Download":
     if not user_data:
         st.warning("Fill the CV first")
     else:
-        import tempfile
-
         with st.spinner("Generating CV..."):
             pdf_bytes = generate_cv_pdf(user_data, return_bytes=True)
 
-        # ✅ Download
+        # ✅ Download button
         st.download_button(
             "⬇️ Download CV",
             pdf_bytes,
@@ -325,12 +323,21 @@ elif menu == "📄 Preview & Download":
             "application/pdf"
         )
 
-        # ✅ Save + Preview
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
-            tmp.write(pdf_bytes)
-            tmp_path = tmp.name
+        # ✅ SAFE preview using iframe + base64 (Streamlit component)
+        import base64
+        import streamlit.components.v1 as components
 
-        st.write("### 📄 Preview")
-        st.pdf(tmp_path)
+        base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
+
+        pdf_html = f"""
+        <iframe
+            src="data:application/pdf;base64,{base64_pdf}"
+            width="100%"
+            height="700"
+            type="application/pdf">
+        </iframe>
+        """
+
+        components.html(pdf_html, height=700)
 
     st.markdown("</div>", unsafe_allow_html=True)
