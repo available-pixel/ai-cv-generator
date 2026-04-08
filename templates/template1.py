@@ -53,8 +53,13 @@ def render_template1(user_data, hex_color="#000000"):
     # ================= PROFILE PHOTO =================
     profile_photo = user_data.get("profile_photo")
     if profile_photo:
-        profile_photo.seek(0)
-        pdf.image(profile_photo, x=180, y=5, w=20, h=0)
+        import tempfile
+
+        with tempfile.NamedTemporaryFile(delete=False, suffix=".jpg") as tmp:
+            tmp.write(profile_photo.read())
+            tmp_path = tmp.name
+
+        pdf.image(tmp_path, x=180, y=5, w=20)
 
     pdf.set_font("DejaVu", "", 11)
     pdf.set_text_color(0, 0, 0)

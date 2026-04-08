@@ -313,21 +313,19 @@ elif menu == "📄 Preview & Download":
         st.warning("Fill the CV first")
     else:
         with st.spinner("Generating CV..."):
-            pdf_file_path = generate_cv_pdf(user_data)
+            pdf_bytes = generate_cv_pdf(user_data, return_bytes=True)
 
         # Download button
-        with open(pdf_file_path, "rb") as f:
-            st.download_button(
-                "⬇️ Download CV",
-                f.read(),
-                "My_CV.pdf",
-                "application/pdf"
-            )
+        st.download_button(
+            "⬇️ Download CV",
+            pdf_bytes,
+            f"{user_data.get('name','My_CV')}.pdf",
+            "application/pdf"
+        )
 
-        # Preview
-        with open(pdf_file_path, "rb") as f:
-            base64_pdf = base64.b64encode(f.read()).decode("utf-8")
-
+        # Inline preview
+        import base64
+        base64_pdf = base64.b64encode(pdf_bytes).decode('utf-8')
         st.markdown(
             f"<iframe src='data:application/pdf;base64,{base64_pdf}' width='100%' height='700'></iframe>",
             unsafe_allow_html=True
