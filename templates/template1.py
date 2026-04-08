@@ -1,16 +1,21 @@
 from fpdf import FPDF
 from utils.text_cleaner import clean_text
+import os
 
 def render_template1(user_data, hex_color="#000000"):
     pdf = FPDF(format="A4", unit="mm")
     pdf.set_auto_page_break(auto=True, margin=15)
     pdf.add_page()
 
-    # Fonts
-    pdf.add_font('DejaVu', '', 'dejavu-sans/DejaVuSans.ttf', uni=True)
-    pdf.add_font('DejaVu', 'B', 'dejavu-sans/DejaVuSans-Bold.ttf', uni=True)
-    pdf.add_font('DejaVu', 'I', 'dejavu-sans/DejaVuSans-Oblique.ttf', uni=True)
-    pdf.add_font('DejaVu', 'BI', 'dejavu-sans/DejaVuSans-BoldOblique.ttf', uni=True)
+    # ================= FONTS =================
+    # Get folder where this file is
+    BASE_DIR = os.path.dirname(__file__)
+    FONT_DIR = os.path.join(BASE_DIR, "../dejavu-sans")  # adjust "../" if your modules folder is nested differently
+
+    pdf.add_font('DejaVu', '', os.path.join(FONT_DIR, 'DejaVuSans.ttf'), uni=True)
+    pdf.add_font('DejaVu', 'B', os.path.join(FONT_DIR, 'DejaVuSans-Bold.ttf'), uni=True)
+    pdf.add_font('DejaVu', 'I', os.path.join(FONT_DIR, 'DejaVuSans-Oblique.ttf'), uni=True)
+    pdf.add_font('DejaVu', 'BI', os.path.join(FONT_DIR, 'DejaVuSans-BoldOblique.ttf'), uni=True)
 
     # Color
     r, g, b = tuple(int(hex_color.lstrip("#")[i:i+2], 16) for i in (0, 2, 4))
