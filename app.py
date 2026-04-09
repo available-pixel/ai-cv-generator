@@ -313,12 +313,11 @@ elif menu == "📄 Preview & Download":
         st.warning("Fill the CV first")
     else:
         import tempfile
-        import streamlit.components.v1 as components
 
         with st.spinner("Generating CV..."):
             pdf_bytes = generate_cv_pdf(user_data, return_bytes=True)
 
-        # ✅ Download button
+        # ✅ Download
         st.download_button(
             "⬇️ Download CV",
             pdf_bytes,
@@ -326,23 +325,12 @@ elif menu == "📄 Preview & Download":
             "application/pdf"
         )
 
-        # ✅ Save temp PDF
+        # ✅ Save + Preview
         with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
             tmp.write(pdf_bytes)
             tmp_path = tmp.name
 
-        # ❗ IMPORTANT: create a local server URL workaround
-        import base64
-        base64_pdf = base64.b64encode(pdf_bytes).decode("utf-8")
-
-        pdf_html = f"""
-        <iframe
-            src="https://docs.google.com/gview?embedded=true&url=data:application/pdf;base64,{base64_pdf}"
-            width="100%"
-            height="700">
-        </iframe>
-        """
-
-        components.html(pdf_html, height=700)
+        st.write("### 📄 Preview")
+        st.pdf(tmp_path)
 
     st.markdown("</div>", unsafe_allow_html=True)
